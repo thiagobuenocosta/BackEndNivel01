@@ -1,9 +1,24 @@
 const express = require( 'express' );
 // const { uuid, isUuid } = require( 'uuidv4' );
-const { v4: uuidv4} = require('uuid');
+const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const app = express();
 app.use( express.json() );
 const projects = [];
+const logRequests = (request, response, next) => {
+    const { method, url } = request;
+    const logLabel = `[${method.toUpperCase()}] ${url}`
+    console.time(logLabel);
+    next();
+    console.timeEnd(logLabel);
+}
+const validateProjectId = (request, response, next) => {
+    const { id } = request.params;
+    if ( !uuidValidate(id) ) {
+        return response.status( 400 ).json( { error:"Invalid project ID!" } )
+    }
+    return next();
+}
+app.use(logRequests);
 app.get( '/', (request, response) => {
     return response.json(projects)
 })
@@ -26,6 +41,7 @@ app.post( '/projects', (request, response) => {
     projects.push(project)
     return response.json(project)
 })
+app.use('/projects/:id', validateProjectId);
 app.put( '/projects/:id', (request, response) => {
     const { id } = request.params;
     const { title, owner } = request.body;
