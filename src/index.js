@@ -4,6 +4,18 @@ const { v4: uuidv4} = require('uuid');
 const app = express();
 app.use( express.json() );
 const projects = [];
+app.get( '/', (request, response) => {
+    return response.json(projects)
+})
+app.get( '/projects', (request, response) => {
+    const { title, owner } = request.query;
+    const project = title ? 
+        projects.filter( project => project.title.includes(title)) :
+        owner ?
+        projects.filter( project => project.owner.includes(owner)) :
+        projects
+    return response.json(project)
+})
 app.post( '/projects', (request, response) => {
     const { title, owner } = request.body;
     const project = {
