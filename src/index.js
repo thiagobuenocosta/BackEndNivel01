@@ -26,6 +26,21 @@ app.post( '/projects', (request, response) => {
     projects.push(project)
     return response.json(project)
 })
+app.put( '/projects/:id', (request, response) => {
+    const { id } = request.params;
+    const { title, owner } = request.body;
+    const projectIndex = projects.findIndex( project => project.id === id )
+    if (projectIndex < 0) {
+        return response.status(400).json({ error: "Project not found" }) 
+    }
+    const project = {
+        id,
+        title,
+        owner
+    }
+    projects[projectIndex] = project;
+    response.json(project)
+})
 app.listen( 3333, () => {
     console.log('Backend Started!')
 });
