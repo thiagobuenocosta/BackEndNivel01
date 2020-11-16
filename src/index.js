@@ -41,6 +41,16 @@ app.put( '/projects/:id', (request, response) => {
     projects[projectIndex] = project;
     response.json(project)
 })
+app.delete( '/projects/:id', (request, response) => {
+    const { id } = request.params;
+    const projectIndex = projects.findIndex( project => project.id === id )
+    if (projectIndex < 0) {
+        return response.status(400).json({ error: "oriject not found!" })
+    }
+    projects.splice(projectIndex, 1)
+
+    return response.status(204).send()
+})
 app.listen( 3333, () => {
     console.log('Backend Started!')
 });
